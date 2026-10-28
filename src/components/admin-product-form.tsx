@@ -1,21 +1,13 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 
-type AdminProduct = { id: string; name: string; slug: string; price: string | number; is_active: boolean };
+export type AdminProduct = { id: string; name: string; slug: string; price: string | number; is_active: boolean };
 
-export function AdminProductForm() {
-  const [products, setProducts] = useState<AdminProduct[]>([]);
+export function AdminProductForm({ initialProducts }: { initialProducts: AdminProduct[] }) {
+  const [products, setProducts] = useState(initialProducts);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  async function load() {
-    const response = await fetch("/api/admin/products");
-    if (!response.ok) throw new Error("Daftar produk tidak dapat dimuat.");
-    setProducts(await response.json());
-  }
-  useEffect(() => { load().catch((reason: unknown) => setError(reason instanceof Error ? reason.message : "Gagal memuat produk.")).finally(() => setLoading(false)); }, []);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -41,7 +33,7 @@ export function AdminProductForm() {
     }
     formElement.reset();
     setNotice("Produk berhasil ditambahkan.");
-    await load();
+    setProducts((current) => [data as AdminProduct, ...current]);
   }
   return <div className="admin-product-layout"><form className="settings-form product-admin-form" onSubmit={submit}>
     <h2>Tambah produk</h2>
@@ -52,5 +44,5 @@ export function AdminProductForm() {
     <label>URL gambar <input name="image_url" type="url" /></label>
     {error && <p className="form-error" role="alert">{error}</p>}{notice && <p className="form-success">{notice}</p>}
     <button className="button">Tambah ke katalog ↗</button>
-  </form><div className="admin-table-wrap"><h2>Produk tersimpan</h2>{loading ? <p className="muted">Memuat produk…</p> : products.length ? <table className="admin-table"><thead><tr><th>Produk</th><th>Harga</th><th>Status</th></tr></thead><tbody>{products.map((product) => <tr key={product.id}><td><strong>{product.name}</strong><small>/{product.slug}</small></td><td>Rp{new Intl.NumberFormat("id-ID").format(Number(product.price))}</td><td>{product.is_active ? "Aktif" : "Nonaktif"}</td></tr>)}</tbody></table> : <p className="muted">Belum ada produk.</p>}</div></div>;
+  </form><div className="admin-table-wrap"><h2>Produk tersimpan</h2>{products.length ? <table className="admin-table"><thead><tr><th>Produk</th><th>Harga</th><th>Status</th></tr></thead><tbody>{products.map((product) => <tr key={product.id}><td><strong>{product.name}</strong><small>/{product.slug}</small></td><td>Rp{new Intl.NumberFormat("id-ID").format(Number(product.price))}</td><td>{product.is_active ? "Aktif" : "Nonaktif"}</td></tr>)}</tbody></table> : <p className="muted">Belum ada produk.</p>}</div></div>;
 }
