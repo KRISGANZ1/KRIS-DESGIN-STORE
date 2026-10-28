@@ -1,3 +1,4 @@
+export const schemaSql = String.raw`
 CREATE TABLE IF NOT EXISTS admins (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   username TEXT NOT NULL UNIQUE,
@@ -74,3 +75,4 @@ INSERT INTO store_settings (key, value) VALUES
   ('site_title', 'KRIS DESIGN X STORE | Produk Digital Premium'),
   ('site_description', 'Temukan produk digital pilihan di KRIS DESIGN X STORE.')
 ON CONFLICT (key) DO NOTHING;
+`;
