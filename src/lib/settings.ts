@@ -5,6 +5,8 @@ export { defaultSettings } from "@/lib/settings-shared";
 export type { StoreSettings } from "@/lib/settings-shared";
 
 export async function getStoreSettings(): Promise<StoreSettings> {
+  if (!process.env.DATABASE_URL) return defaultSettings;
+
   const { rows } = await db.query<{ key: keyof StoreSettings; value: string }>(
     "SELECT key, value FROM store_settings WHERE key = ANY($1)",
     [Object.keys(defaultSettings)],

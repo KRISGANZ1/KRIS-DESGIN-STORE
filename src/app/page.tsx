@@ -5,9 +5,11 @@ import { Product, ProductCard } from "@/components/product-card";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const { rows: products } = await db.query<Product>(
-    "SELECT id, slug, name, description, price, image_url FROM products WHERE is_active = TRUE ORDER BY created_at DESC LIMIT 6",
-  );
+  const products = process.env.DATABASE_URL
+    ? (await db.query<Product>(
+        "SELECT id, slug, name, description, price, image_url FROM products WHERE is_active = TRUE ORDER BY created_at DESC LIMIT 6",
+      )).rows
+    : [];
   return (
     <>
       <section className="hero container">
